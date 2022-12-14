@@ -181,6 +181,52 @@ export class AppRunnerStack extends Stack {
     /*
       L1 Construct for AppRunner Service
     */
+    new CfnService(this, "AppRunnerServiceL1", {
+      sourceConfiguration: {
+        autoDeploymentsEnabled: true,
+        authenticationConfiguration: {
+          connectionArn: connectionArn,
+        },
+        codeRepository: {
+          repositoryUrl: this.stackInput.sourceConfigurationProps.repositoryUrl,
+          sourceCodeVersion: {
+            type: "BRANCH",
+            value: this.stackInput.sourceConfigurationProps.branchName,
+          },
+          codeConfiguration: {
+            configurationSource: "API",
+            codeConfigurationValues: {
+              runtime: "GO_1",
+              port: String(this.stackInput.sourceConfigurationProps.port),
+              startCommand: this.stackInput.sourceConfigurationProps.startCommand,
+              buildCommand: this.stackInput.sourceConfigurationProps.buildCommand,
+              runtimeEnvironmentVariables: [
+                {
+                  name: "ENV1",
+                  value: "L1",
+                },
+              ],
+            },
+          },
+        },
+      },
+      healthCheckConfiguration: {
+        path: "/",
+        protocol: "HTTP",
+      },
+      instanceConfiguration: {
+        cpu: this.stackInput.instanceConfigurationProps.cpu,
+        memory: this.stackInput.instanceConfigurationProps.memory,
+        instanceRoleArn: appRunnerInstanceRole.roleArn,
+      },
+      networkConfiguration: {
+        egressConfiguration: {
+          egressType: "VPC",
+          vpcConnectorArn: vpcConnectorL1.attrVpcConnectorArn,
+        },
+      },
+      autoScalingConfigurationArn: autoScalingConfigurationArn,
+    });
   }
 
   private async createConnection(connectionName: string, region: string): Promise<string> {
