@@ -34,10 +34,13 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
+    "@aws-cdk/aws-apprunner-alpha": "^2.54.0-alpha.0",
+    "@aws-sdk/client-apprunner": "^3.229.0",
     "aws-cdk-lib": "2.31.0",
     "aws-sdk": "^2.1175.0",
     "constructs": "^10.0.0",
     "express": "^4.18.2",
+    "yesno": "^0.4.0",
     "zod": "^3.17.3"
   }
 }
