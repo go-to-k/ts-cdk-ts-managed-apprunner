@@ -171,7 +171,16 @@ export class AppRunnerStack extends Stack {
     });
 
     const cfnAppRunner = appRunnerServiceL2.node.defaultChild as CfnService;
-    // cfnAppRunner.
+    cfnAppRunner.autoScalingConfigurationArn = autoScalingConfigurationArn;
+    cfnAppRunner.healthCheckConfiguration = {
+      path: "/",
+      protocol: "HTTP",
+    };
+    cfnAppRunner.addPropertyOverride("SourceConfiguration.AutoDeploymentsEnabled", true);
+
+    /*
+      L1 Construct for AppRunner Service
+    */
   }
 
   private async createConnection(connectionName: string, region: string): Promise<string> {
