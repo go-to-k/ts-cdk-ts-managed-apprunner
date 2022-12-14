@@ -25,8 +25,8 @@ export const handler = async function (
   const input: InputProps = {
     autoScalingConfigurationName: event.ResourceProperties["AutoScalingConfigurationName"],
     maxConcurrency: event.ResourceProperties["MaxConcurrency"],
-    maxSize: event.ResourceProperties["maxSize"],
-    minSize: event.ResourceProperties["minSize"],
+    maxSize: event.ResourceProperties["MaxSize"],
+    minSize: event.ResourceProperties["MinSize"],
   };
 
   if (requestType === "Create") {
