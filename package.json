@@ -5,8 +5,8 @@
     "ts-cdk-ts-managed-apprunner": "bin/ts-cdk-ts-managed-apprunner.js"
   },
   "scripts": {
-    "build": "esbuild ./index.ts --bundle ./index.js --outdir=./ --platform=node --minify --allow-overwrite",
-    "watch": "esbuild ./index.ts --bundle ./index.js --outdir=./ --platform=node --minify --allow-overwrite  --watch",
+    "build": "esbuild ./index.ts --bundle --outfile=./index.js --platform=node --minify --allow-overwrite",
+    "watch": "esbuild ./index.ts --bundle --outfile=./index.js --platform=node --minify --allow-overwrite  --watch",
     "test": "jest",
     "test:cov": "jest --coverage=true",
     "test:upd": "jest --updateSnapshot",
