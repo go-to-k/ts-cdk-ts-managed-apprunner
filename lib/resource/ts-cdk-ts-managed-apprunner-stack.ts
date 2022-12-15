@@ -15,9 +15,10 @@ import {
 import { CustomResource, Stack } from "aws-cdk-lib";
 import { CfnService, CfnVpcConnector } from "aws-cdk-lib/aws-apprunner";
 import { SecurityGroup, Vpc, Subnet } from "aws-cdk-lib/aws-ec2";
-import { Policy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { Provider } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import yesno from "yesno";
 import { ConfigStackProps, StackInput } from "../config";
@@ -48,6 +49,14 @@ export class AppRunnerStack extends Stack {
       ],
     });
 
+    const autoScalingConfigurationProvider = new Provider(
+      this,
+      "AutoScalingConfigurationProvider",
+      {
+        onEventHandler: customResourceLambda,
+      },
+    );
+
     /*
       AutoScalingConfiguration
     */
@@ -66,7 +75,7 @@ export class AppRunnerStack extends Stack {
     const autoScalingConfiguration = new CustomResource(this, "AutoScalingConfiguration", {
       resourceType: "Custom::AutoScalingConfiguration",
       properties: autoScalingConfigurationProperties,
-      serviceToken: customResourceLambda.functionArn,
+      serviceToken: autoScalingConfigurationProvider.serviceToken,
     });
     const autoScalingConfigurationArn = autoScalingConfiguration.getAttString(
       "AutoScalingConfigurationArn",
