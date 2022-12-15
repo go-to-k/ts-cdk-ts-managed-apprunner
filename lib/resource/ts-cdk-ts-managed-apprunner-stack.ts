@@ -22,6 +22,7 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Provider } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import { ConfigStackProps, StackInput } from "../config";
+import * as readline from "readline";
 
 export class AppRunnerStack extends Stack {
   private stackInput: StackInput;
@@ -276,7 +277,21 @@ export class AppRunnerStack extends Stack {
   }
 
   private async yesno(msg: string): Promise<boolean> {
-    const answer = await question(msg);
+    const answer = await this.getInput(msg);
     return answer === "Y" || answer === "y";
+  }
+
+  private async getInput(message: string): Promise<string> {
+    const readlineInterface = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    return new Promise<string>((resolve) => {
+      readlineInterface.question(message, (ans) => {
+        resolve(ans);
+        readlineInterface.close();
+      });
+    });
   }
 }
