@@ -6,7 +6,7 @@ import { configStackProps } from "../lib/config";
 
 const app = new App();
 
-const appRunner = new AppRunnerStack(app, "AppRunnerStack", configStackProps);
+const appRunner = new AppRunnerStack(app, "AppRunnerTsStack", configStackProps);
 (async () => {
   await appRunner.create();
 })();
