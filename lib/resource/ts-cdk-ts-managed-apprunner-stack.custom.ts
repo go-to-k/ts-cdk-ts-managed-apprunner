@@ -4,7 +4,7 @@ import {
   DeleteAutoScalingConfigurationCommand,
   ListAutoScalingConfigurationsCommand,
 } from "@aws-sdk/client-apprunner";
-import { CdkCustomResourceEvent, CdkCustomResourceResponse } from "aws-lambda";
+import { CdkCustomResourceHandler } from "aws-lambda";
 
 interface InputProps {
   autoScalingConfigurationName: string;
@@ -17,16 +17,16 @@ const appRunnerClient = new AppRunnerClient({
   region: process.env.REGION,
 });
 
-export const handler = async function (
-  event: CdkCustomResourceEvent,
-): Promise<CdkCustomResourceResponse> {
+export const handler: CdkCustomResourceHandler = async function (event) {
   const data: { [key: string]: string } = {};
   const requestType = event.RequestType;
   const input: InputProps = {
-    autoScalingConfigurationName: event.ResourceProperties["AutoScalingConfigurationName"],
-    maxConcurrency: event.ResourceProperties["MaxConcurrency"],
-    maxSize: event.ResourceProperties["MaxSize"],
-    minSize: event.ResourceProperties["MinSize"],
+    autoScalingConfigurationName: event.ResourceProperties[
+      "AutoScalingConfigurationName"
+    ] as string,
+    maxConcurrency: Number(event.ResourceProperties["MaxConcurrency"] as string),
+    maxSize: Number(event.ResourceProperties["MaxSize"] as string),
+    minSize: Number(event.ResourceProperties["MinSize"] as string),
   };
 
   if (requestType === "Create") {
@@ -42,7 +42,7 @@ export const handler = async function (
     );
 
     data["AutoScalingConfigurationArn"] =
-      createAutoScalingConfigurationResponse.AutoScalingConfiguration
+      createAutoScalingConfigurationResponse?.AutoScalingConfiguration
         ?.AutoScalingConfigurationArn ?? "";
   } else if (requestType === "Delete") {
     const listAutoScalingConfigurationCommand = new ListAutoScalingConfigurationsCommand({

@@ -36,25 +36,17 @@ export class AppRunnerStack extends Stack {
       Custom Resource Lambda for creation of AutoScalingConfiguration
      */
     const customResourceLambda = new NodejsFunction(this, "custom", {
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_14_X,
       bundling: {
         forceDockerBundling: false,
       },
+      initialPolicy: [
+        new PolicyStatement({
+          actions: ["apprunner:*AutoScalingConfiguration*"],
+          resources: ["*"],
+        }),
+      ],
     });
-
-    /*
-      Custom Resource Lambda for creation of AutoScalingConfiguration
-     */
-    customResourceLambda.role?.attachInlinePolicy(
-      new Policy(this, "CustomResourceLambdaPolicy", {
-        statements: [
-          new PolicyStatement({
-            actions: ["apprunner:*AutoScalingConfiguration*"],
-            resources: ["*"],
-          }),
-        ],
-      }),
-    );
 
     /*
       AutoScalingConfiguration
@@ -98,26 +90,26 @@ export class AppRunnerStack extends Stack {
     /*
       L2 Construct(alpha version) for VPC Connector
 	  */
+    const vpc = Vpc.fromLookup(this, "VPCForSecurityGroupForVpcConnectorL2", {
+      vpcId: this.stackInput.vpcConnectorProps.vpcID,
+    });
+
     const securityGroupForVpcConnectorL2 = new SecurityGroup(
       this,
       "SecurityGroupForVpcConnectorL2",
       {
-        vpc: Vpc.fromLookup(this, "VPCForSecurityGroupForVpcConnectorL2", {
-          vpcId: this.stackInput.vpcConnectorProps.vpcID,
-        }),
+        vpc: vpc,
         description: "for AppRunner VPC Connector L2",
       },
     );
 
     const vpcConnectorL2 = new VpcConnector(this, "VpcConnectorL2", {
-      vpc: Vpc.fromLookup(this, "VPCForSecurityGroupForVpcConnectorL2", {
-        vpcId: this.stackInput.vpcConnectorProps.vpcID,
-      }),
+      vpc: vpc,
       securityGroups: [securityGroupForVpcConnectorL2],
       vpcSubnets: {
         subnets: [
           Subnet.fromSubnetId(this, "Subnet1", this.stackInput.vpcConnectorProps.subnetID1),
-          Subnet.fromSubnetId(this, "Subnet1", this.stackInput.vpcConnectorProps.subnetID2),
+          Subnet.fromSubnetId(this, "Subnet2", this.stackInput.vpcConnectorProps.subnetID2),
         ],
       },
     });
@@ -129,9 +121,7 @@ export class AppRunnerStack extends Stack {
       this,
       "SecurityGroupForVpcConnectorL1",
       {
-        vpc: Vpc.fromLookup(this, "VPCForSecurityGroupForVpcConnectorL1", {
-          vpcId: this.stackInput.vpcConnectorProps.vpcID,
-        }),
+        vpc: vpc,
         description: "for AppRunner VPC Connector L1",
       },
     );
@@ -244,7 +234,7 @@ export class AppRunnerStack extends Stack {
       // If there is already a connection, return the connection ARN
       if (listConnectionsResponse.ConnectionSummaryList?.length) {
         if (listConnectionsResponse.ConnectionSummaryList[0].Status === "PENDING_HANDSHAKE") {
-          this.confirmCompleteHandshake();
+          await this.confirmCompleteHandshake();
         }
         return listConnectionsResponse.ConnectionSummaryList[0].ConnectionArn ?? "";
       }
@@ -257,7 +247,7 @@ export class AppRunnerStack extends Stack {
 
       const createConnectionResponse = await appRunnerClient.send(createConnectionCommand);
 
-      this.confirmCompleteHandshake();
+      await this.confirmCompleteHandshake();
 
       return createConnectionResponse.Connection?.ConnectionArn ?? "";
     } catch (err) {
