@@ -45,18 +45,18 @@ export interface AutoScalingConfigurationArnProps {
 
 export const stackInput: StackInput = {
   stackEnv: {
-    account: "123456789012", // Your AWS Account ID
+    account: "************", // Your AWS Account ID
     region: "ap-northeast-1",
   },
   vpcConnectorProps: {
-    vpcID: "vpc-**************", // Your VPC ID
-    subnetID1: "subnet-**************", // Your Subnet ID
-    subnetID2: "subnet-**************", // Your Subnet ID
+    vpcID: "vpc-************", // Your VPC ID
+    subnetID1: "subnet-************", // Your Subnet ID
+    subnetID2: "subnet-************", // Your Subnet ID
   },
   sourceConfigurationProps: {
     repositoryUrl: "https://github.com/go-to-k/ts-cdk-ts-managed-apprunner",
     branchName: "master",
-    buildCommand: "cd app && yarn install --non-interactive --frozen-lockfile --prod && yarn build",
+    buildCommand: "cd app && yarn install --non-interactive --frozen-lockfile && yarn build",
     startCommand: "node app/index.js",
     port: 8080,
     connectionName: "AppRunnerConnection",
