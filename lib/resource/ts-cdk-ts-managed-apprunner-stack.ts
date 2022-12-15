@@ -246,8 +246,9 @@ export class AppRunnerStack extends Stack {
       ) {
         console.log("GitHub Connection is PENDING_HANDSHAKE or not exist.");
         console.log("Do the next steps.");
-        console.log("1. Run below shell script.");
-        console.log("$ bash./ create_connection.sh - c AppRunnerConnection.");
+        console.log("1. Run the shell script.");
+        console.log("# bash ./create_connection.sh -c AppRunnerConnection");
+        console.log("# bash ./create_connection.sh -c AppRunnerConnection -p profile");
         console.log("2. Click the Complete HANDSHAKE button at your AWS App Runner console.");
         console.log();
         throw new Error("GitHubConnectionError");
