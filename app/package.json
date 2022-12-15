@@ -1,9 +1,4 @@
 {
-  "name": "ts-cdk-ts-managed-apprunner",
-  "version": "0.1.0",
-  "bin": {
-    "ts-cdk-ts-managed-apprunner": "bin/ts-cdk-ts-managed-apprunner.js"
-  },
   "scripts": {
     "build": "esbuild ./index.ts --bundle ./index.js --outdir=./ --platform=node --minify --allow-overwrite",
     "watch": "esbuild ./index.ts --bundle ./index.js --outdir=./ --platform=node --minify --allow-overwrite  --watch",
@@ -13,13 +8,12 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.101",
+    "@types/express": "^4.17.15",
     "@types/jest": "^27.5.2",
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
-    "aws-cdk": "2.31.0",
     "esbuild": "^0.15.9",
     "eslint": "^8.19.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -30,15 +24,10 @@
     "prettier": "^2.7.1",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.8.1",
+    "tsc": "^2.0.4",
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "@aws-cdk/aws-apprunner-alpha": "^2.54.0-alpha.0",
-    "@aws-sdk/client-apprunner": "^3.229.0",
-    "aws-cdk-lib": "2.31.0",
-    "aws-lambda": "^1.0.7",
-    "aws-sdk": "^2.1175.0",
-    "constructs": "^10.0.0",
-    "yesno": "^0.4.0"
+    "express": "^4.18.2"
   }
 }
