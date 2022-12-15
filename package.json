@@ -38,7 +38,6 @@
     "aws-cdk-lib": "2.31.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1175.0",
-    "constructs": "^10.0.0",
-    "yesno": "^0.4.0"
+    "constructs": "^10.0.0"
   }
 }

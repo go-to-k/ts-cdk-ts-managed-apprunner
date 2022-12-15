@@ -21,7 +21,6 @@ import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Provider } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
-import yesno from "yesno";
 import { ConfigStackProps, StackInput } from "../config";
 
 export class AppRunnerStack extends Stack {
@@ -38,7 +37,7 @@ export class AppRunnerStack extends Stack {
       Custom Resource Lambda for creation of AutoScalingConfiguration
      */
     const customResourceLambda = new NodejsFunction(this, "custom", {
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       bundling: {
         forceDockerBundling: false,
       },
@@ -157,7 +156,7 @@ export class AppRunnerStack extends Stack {
         branch: this.stackInput.sourceConfigurationProps.branchName,
         configurationSource: ConfigurationSourceType.API,
         codeConfigurationValues: {
-          runtime: appRunnerRuntime.NODEJS_14,
+          runtime: appRunnerRuntime.NODEJS_16,
           port: String(this.stackInput.sourceConfigurationProps.port),
           startCommand: this.stackInput.sourceConfigurationProps.startCommand,
           buildCommand: this.stackInput.sourceConfigurationProps.buildCommand,
@@ -196,7 +195,7 @@ export class AppRunnerStack extends Stack {
           codeConfiguration: {
             configurationSource: "API",
             codeConfigurationValues: {
-              runtime: "NODEJS_14",
+              runtime: "NODEJS_16",
               port: String(this.stackInput.sourceConfigurationProps.port),
               startCommand: this.stackInput.sourceConfigurationProps.startCommand,
               buildCommand: this.stackInput.sourceConfigurationProps.buildCommand,
@@ -268,13 +267,16 @@ export class AppRunnerStack extends Stack {
   private async confirmCompleteHandshake(): Promise<void> {
     for (;;) {
       console.log('Now, click the "Complete handshake" button at the AWS App Runner console.');
-      const ok = await yesno({
-        question: "Did you click the button?",
-      });
+      const ok = await this.yesno("Did you click the button?");
 
       if (ok) {
         return;
       }
     }
+  }
+
+  private async yesno(msg: string): Promise<boolean> {
+    const answer = await question(msg);
+    return answer === "Y" || answer === "y";
   }
 }
