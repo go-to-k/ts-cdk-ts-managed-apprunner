@@ -8,11 +8,7 @@ import {
   Source,
   VpcConnector,
 } from "@aws-cdk/aws-apprunner-alpha";
-import {
-  AppRunnerClient,
-  CreateConnectionCommand,
-  ListConnectionsCommand,
-} from "@aws-sdk/client-apprunner";
+import { AppRunnerClient, ListConnectionsCommand } from "@aws-sdk/client-apprunner";
 import { CustomResource, Stack } from "aws-cdk-lib";
 import { CfnService, CfnVpcConnector } from "aws-cdk-lib/aws-apprunner";
 import { SecurityGroup, Vpc, Subnet } from "aws-cdk-lib/aws-ec2";
@@ -22,7 +18,6 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Provider } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import { ConfigStackProps, StackInput } from "../config";
-import * as readline from "readline";
 
 export class AppRunnerStack extends Stack {
   private stackInput: StackInput;
@@ -31,9 +26,13 @@ export class AppRunnerStack extends Stack {
     super(scope, id, props);
 
     this.stackInput = props.config;
+
+    (async () => {
+      await this.create();
+    })();
   }
 
-  public async create() {
+  private async create() {
     /*
       Custom Resource Lambda for creation of AutoScalingConfiguration
      */
@@ -85,7 +84,7 @@ export class AppRunnerStack extends Stack {
     /*
       ConnectionArn for GitHub Connection
     */
-    const connectionArn = await this.createConnection(
+    const connectionArn = await this.getConnection(
       this.stackInput.sourceConfigurationProps.connectionName,
       this.stackInput.stackEnv.region,
     );
@@ -229,7 +228,7 @@ export class AppRunnerStack extends Stack {
     });
   }
 
-  private async createConnection(connectionName: string, region: string): Promise<string> {
+  private async getConnection(connectionName: string, region: string): Promise<string> {
     try {
       const appRunnerClient = new AppRunnerClient({
         region: region,
@@ -241,57 +240,22 @@ export class AppRunnerStack extends Stack {
 
       const listConnectionsResponse = await appRunnerClient.send(listConnectionsCommand);
 
-      // If there is already a connection, return the connection ARN
-      if (listConnectionsResponse.ConnectionSummaryList?.length) {
-        if (listConnectionsResponse.ConnectionSummaryList[0].Status === "PENDING_HANDSHAKE") {
-          await this.confirmCompleteHandshake();
-        }
-        return listConnectionsResponse.ConnectionSummaryList[0].ConnectionArn ?? "";
+      if (
+        !listConnectionsResponse.ConnectionSummaryList?.length ||
+        listConnectionsResponse.ConnectionSummaryList[0].Status === "PENDING_HANDSHAKE"
+      ) {
+        console.log("GitHub Connection is PENDING_HANDSHAKE or not exist.");
+        console.log("Do the next steps.");
+        console.log("1. Run below shell script.");
+        console.log("$ bash./ create_connection.sh - c AppRunnerConnection.");
+        console.log("2. Click the Complete HANDSHAKE button at your AWS App Runner console.");
+        console.log();
+        throw new Error("GitHubConnectionError");
       }
 
-      // Otherwise, create a connection
-      const createConnectionCommand = new CreateConnectionCommand({
-        ConnectionName: connectionName,
-        ProviderType: "GITHUB",
-      });
-
-      const createConnectionResponse = await appRunnerClient.send(createConnectionCommand);
-
-      await this.confirmCompleteHandshake();
-
-      return createConnectionResponse.Connection?.ConnectionArn ?? "";
+      return listConnectionsResponse.ConnectionSummaryList[0].ConnectionArn ?? "";
     } catch (err) {
       throw err;
     }
-  }
-
-  private async confirmCompleteHandshake(): Promise<void> {
-    for (;;) {
-      console.log('Now, click the "Complete handshake" button at the AWS App Runner console.');
-      const ok = await this.yesno("Did you click the button?");
-
-      if (ok) {
-        return;
-      }
-    }
-  }
-
-  private async yesno(msg: string): Promise<boolean> {
-    const answer = await this.getInput(msg);
-    return answer === "Y" || answer === "y";
-  }
-
-  private async getInput(message: string): Promise<string> {
-    const readlineInterface = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    return new Promise<string>((resolve) => {
-      readlineInterface.question(message, (ans) => {
-        resolve(ans);
-        readlineInterface.close();
-      });
-    });
   }
 }
