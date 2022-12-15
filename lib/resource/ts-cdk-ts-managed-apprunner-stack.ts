@@ -244,13 +244,13 @@ export class AppRunnerStack extends Stack {
         !listConnectionsResponse.ConnectionSummaryList?.length ||
         listConnectionsResponse.ConnectionSummaryList[0].Status === "PENDING_HANDSHAKE"
       ) {
-        console.log("GitHub Connection is PENDING_HANDSHAKE or not exist.");
-        console.log("Do the next steps.");
-        console.log("1. Run the shell script.");
-        console.log("# bash ./create_connection.sh -c AppRunnerConnection");
-        console.log("# bash ./create_connection.sh -c AppRunnerConnection -p profile");
-        console.log("2. Click the Complete HANDSHAKE button at your AWS App Runner console.");
-        console.log();
+        console.error("GitHub Connection is PENDING_HANDSHAKE or not exist.");
+        console.error("Do the next steps.");
+        console.error("1. Run the shell script.");
+        console.error("# bash ./create_connection.sh -c AppRunnerConnection");
+        console.error("# bash ./create_connection.sh -c AppRunnerConnection -p profile");
+        console.error("2. Click the Complete HANDSHAKE button at your AWS App Runner console.");
+        console.error();
         throw new Error("GitHubConnectionError");
       }
 
