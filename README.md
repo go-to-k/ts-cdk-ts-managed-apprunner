@@ -2,16 +2,16 @@
 
 [TypeScript マネージドな App Runner を CDK で構築する](https://go-to-k.hatenablog.com/entry/ts-cdk-ts-managed-apprunner)
 
+## deploy
+
 ```sh
 yarn install
 
-# If you did not create any GitHub Connections yet.
-bash ./create_connection.sh -c AppRunnerConnection
-### if specify a profile
-# bash ./create_connection.sh -c AppRunnerConnection -p profile
+# If you did not create any GitHub Connections yet. If you want to specify a profile, use `-p` option.
+bash ./create_connection.sh -c AppRunnerConnection [-p profile]
 
-# Then, click the Complete HANDSHAKE button at your AWS App Runner console.
+# Before deploy, click the "Complete HANDSHAKE" button at your AWS App Runner console.
 
 # deploy
-yarn run cdk deploy
+yarn cdk deploy
 ```
