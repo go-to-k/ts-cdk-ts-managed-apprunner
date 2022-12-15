@@ -3,6 +3,7 @@ import {
   Cpu,
   GitHubConnection,
   Memory,
+  Runtime as appRunnerRuntime,
   Service,
   Source,
   VpcConnector,
@@ -49,6 +50,9 @@ export class AppRunnerStack extends Stack {
       ],
     });
 
+    /*
+      AutoScalingConfiguration
+    */
     const autoScalingConfigurationProvider = new Provider(
       this,
       "AutoScalingConfigurationProvider",
@@ -57,9 +61,6 @@ export class AppRunnerStack extends Stack {
       },
     );
 
-    /*
-      AutoScalingConfiguration
-    */
     const autoScalingConfigurationProperties: { [key: string]: string } = {};
     autoScalingConfigurationProperties["AutoScalingConfigurationName"] = this.stackName;
     autoScalingConfigurationProperties["MaxConcurrency"] = String(
@@ -156,7 +157,7 @@ export class AppRunnerStack extends Stack {
         branch: this.stackInput.sourceConfigurationProps.branchName,
         configurationSource: ConfigurationSourceType.API,
         codeConfigurationValues: {
-          runtime: Runtime.NODEJS_14_X,
+          runtime: appRunnerRuntime.NODEJS_14,
           port: String(this.stackInput.sourceConfigurationProps.port),
           startCommand: this.stackInput.sourceConfigurationProps.startCommand,
           buildCommand: this.stackInput.sourceConfigurationProps.buildCommand,
@@ -195,7 +196,7 @@ export class AppRunnerStack extends Stack {
           codeConfiguration: {
             configurationSource: "API",
             codeConfigurationValues: {
-              runtime: "GO_1",
+              runtime: "NODEJS_14",
               port: String(this.stackInput.sourceConfigurationProps.port),
               startCommand: this.stackInput.sourceConfigurationProps.startCommand,
               buildCommand: this.stackInput.sourceConfigurationProps.buildCommand,
