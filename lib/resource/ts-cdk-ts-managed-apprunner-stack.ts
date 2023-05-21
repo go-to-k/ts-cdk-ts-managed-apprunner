@@ -9,7 +9,7 @@ import {
   VpcConnector,
 } from "@aws-cdk/aws-apprunner-alpha";
 import { AppRunnerClient, ListConnectionsCommand } from "@aws-sdk/client-apprunner";
-import { CustomResource, Stack } from "aws-cdk-lib";
+import { CfnOutput, CustomResource, Duration, Stack } from "aws-cdk-lib";
 import { CfnService, CfnVpcConnector } from "aws-cdk-lib/aws-apprunner";
 import { SecurityGroup, Vpc, Subnet } from "aws-cdk-lib/aws-ec2";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
@@ -41,10 +41,19 @@ export class AppRunnerStack extends Stack {
       bundling: {
         forceDockerBundling: false,
       },
+      timeout: Duration.seconds(900),
       initialPolicy: [
         new PolicyStatement({
-          actions: ["apprunner:*AutoScalingConfiguration*"],
+          actions: [
+            "apprunner:*AutoScalingConfiguration*",
+            "apprunner:UpdateService",
+            "apprunner:ListOperations",
+          ],
           resources: ["*"],
+        }),
+        new PolicyStatement({
+          actions: ["cloudformation:DescribeStacks"],
+          resources: [this.stackId],
         }),
       ],
     });
@@ -71,6 +80,7 @@ export class AppRunnerStack extends Stack {
     autoScalingConfigurationProperties["MinSize"] = String(
       this.stackInput.autoScalingConfigurationArnProps.minSize,
     );
+    autoScalingConfigurationProperties["StackName"] = this.stackName;
 
     const autoScalingConfiguration = new CustomResource(this, "AutoScalingConfiguration", {
       resourceType: "Custom::AutoScalingConfiguration",
@@ -180,7 +190,7 @@ export class AppRunnerStack extends Stack {
     /*
       L1 Construct for AppRunner Service
     */
-    new CfnService(this, "AppRunnerServiceL1", {
+    const appRunnerServiceL1 = new CfnService(this, "AppRunnerServiceL1", {
       sourceConfiguration: {
         autoDeploymentsEnabled: true,
         authenticationConfiguration: {
@@ -225,6 +235,16 @@ export class AppRunnerStack extends Stack {
         },
       },
       autoScalingConfigurationArn: autoScalingConfigurationArn,
+    });
+
+    new CfnOutput(this, "AppRunnerServiceL2ServiceArn", {
+      value: appRunnerServiceL2.serviceArn,
+      exportName: `${this.stackName}AppRunnerServiceL2ServiceArn`,
+    });
+
+    new CfnOutput(this, "AppRunnerServiceL1ServiceArn", {
+      value: appRunnerServiceL1.attrServiceArn,
+      exportName: `${this.stackName}AppRunnerServiceL1ServiceArn`,
     });
   }
 
