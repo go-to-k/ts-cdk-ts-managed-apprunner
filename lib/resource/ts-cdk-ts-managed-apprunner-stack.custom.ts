@@ -158,17 +158,22 @@ const waitOperation = async (operationId: string, serviceArn: string): Promise<v
 
     const response = await appRunnerClient.send(listOperationsCommand);
 
-    if (response.OperationSummaryList && response.OperationSummaryList.length) {
-      const operationSummary = response.OperationSummaryList.find(
-        (operation) => operation.Id === operationId,
-      );
-      if (
-        operationSummary?.Status !== OperationStatus.IN_PROGRESS &&
-        operationSummary?.Status !== OperationStatus.PENDING
-      ) {
-        break;
-      }
+    if (!response?.OperationSummaryList?.length) {
+      throw new Error("OperationSummaryList is empty");
+    }
+
+    const operationSummary = response.OperationSummaryList.find(
+      (operation) => operation.Id === operationId,
+    );
+    if (operationSummary?.Status === OperationStatus.SUCCEEDED) {
+      return;
+    } else if (
+      operationSummary?.Status === OperationStatus.IN_PROGRESS ||
+      operationSummary?.Status === OperationStatus.PENDING
+    ) {
       await new Promise((resolve) => setTimeout(resolve, 10000));
+    } else {
+      throw new Error(`OperationError status: ${operationSummary?.Status}`);
     }
   }
 };
