@@ -7,11 +7,20 @@
 ```sh
 yarn install
 
-# If you did not create any GitHub Connections yet. If you want to specify a profile, use `-p` option.
+# まだGitHub接続を作成していない場合は事前にシェルで作成も可能(投げずにcdk deployだけでも可能)
 bash ./create_connection.sh -c AppRunnerConnection [-p profile]
 
-# Before deploy, click the "Complete HANDSHAKE" button at your AWS App Runner console.
-
 # deploy
+# 初回デプロイ時は、deployコマンド実行後にApp RunnerコンソールのGitHub接続ページで「ハンドシェイクを完了」というボタンを押す
 yarn cdk deploy
+```
+
+## 注意
+
+AutoScalingConfiguration の値を変更するときなどに、以下のメッセージが 1 回または複数回イベントログに出力された後、App Runner サービスの更新に失敗することがあります。
+
+- イベントログ
+
+```
+05-27-2023 01:29:08 AM [AppRunner] Failed to create App Runner instances due to low vCPU limit. Increase your Fargate On-Demand vCPU resource count and re-try.
 ```
