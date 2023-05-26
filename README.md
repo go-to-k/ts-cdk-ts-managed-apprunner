@@ -17,7 +17,7 @@ yarn cdk deploy
 
 ## 注意
 
-AutoScalingConfiguration の値を変更するときなどに、以下のメッセージが 1 回または複数回イベントログに出力された後、App Runner サービスの更新に失敗することがあります。
+AutoScalingConfiguration の値を変更するときなどに、以下のメッセージが 1 回または複数回イベントログに出力された後、App Runner サービスの更新に失敗することがあります。(原因不明)
 
 - イベントログ
 
