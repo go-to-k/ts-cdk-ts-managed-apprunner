@@ -17,10 +17,9 @@ yarn cdk deploy
 
 ## 注意
 
-AutoScalingConfiguration の値を変更するときなどに、以下のメッセージが 1 回または複数回イベントログに出力された後、App Runner サービスの更新に失敗することがあります。
-
-- イベントログ
-
-```
-05-27-2023 01:29:08 AM [AppRunner] Failed to create App Runner instances due to low vCPU limit. Increase your Fargate On-Demand vCPU resource count and re-try.
-```
+- AWS アカウントの AWS Fargate クォータ(Fargate On-Demand vCPU resource count)値により、CPU, Memory, AutoScalingConfiguration の設定値次第では更新エラーになることがあります。
+  - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-quotas.html
+  - 以下のメッセージが 1 回または複数回イベントログに出力された後にサービス更新がエラーになる
+    ```
+    05-27-2023 01:29:08 AM [AppRunner] Failed to create App Runner instances due to low vCPU limit. Increase your Fargate On-Demand vCPU resource count and re-try.
+    ```
