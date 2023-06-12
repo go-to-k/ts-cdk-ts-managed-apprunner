@@ -177,6 +177,7 @@ export class AppRunnerStack extends Stack {
       cpu: Cpu.of(this.stackInput.instanceConfigurationProps.cpu),
       memory: Memory.of(this.stackInput.instanceConfigurationProps.memory),
       vpcConnector: vpcConnectorL2,
+      autoDeploymentsEnabled: true,
     });
 
     const cfnAppRunner = appRunnerServiceL2.node.defaultChild as CfnService;
@@ -185,7 +186,6 @@ export class AppRunnerStack extends Stack {
       path: "/",
       protocol: "HTTP",
     };
-    cfnAppRunner.addPropertyOverride("SourceConfiguration.AutoDeploymentsEnabled", true);
 
     /*
       L1 Construct for AppRunner Service
